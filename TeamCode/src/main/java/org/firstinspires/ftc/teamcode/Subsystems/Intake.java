@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-/** Small helper for controlling the robot's intake motor. */
+// controls intake motor speed
 public class Intake {
     private final DcMotor motor;
     private double speed = 1;

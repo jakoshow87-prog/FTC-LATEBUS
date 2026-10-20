@@ -3,7 +3,8 @@ package org.firstinspires.ftc.teamcode.TestOpModes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+//will rewrite soon with PIDF control
 @TeleOp(name = "Shooter OpMode", group = "Test")
 public class ShooterTestOpMode extends LinearOpMode {
 
@@ -13,7 +14,7 @@ public class ShooterTestOpMode extends LinearOpMode {
     public void runOpMode() {
         shooterMotor = hardwareMap.get(DcMotor.class, "shooter");
 
-        shooterMotor.setDirection(DcMotor.Direction.FORWARD);
+        shooterMotor.setDirection(DcMotor.Direction.REVERSE);
         shooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addData("Status", "Initialized");
@@ -24,7 +25,7 @@ public class ShooterTestOpMode extends LinearOpMode {
         while (opModeIsActive()) {
 
             if (gamepad1.a) {
-                shooterMotor.setPower(1.0);
+                shooterMotor.setPower(0.85);
             }
             else if (gamepad1.start) {
                 shooterMotor.setPower(0.0);
