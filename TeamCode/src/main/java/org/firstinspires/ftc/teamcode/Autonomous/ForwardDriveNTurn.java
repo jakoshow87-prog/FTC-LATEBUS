@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "ForwardDrive", group = "Auto")
-public class ForwardDrive extends LinearOpMode {
+@Autonomous(name = "ForwardDriveNTurn", group = "Auto")
+public class ForwardDriveNTurn extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -30,7 +30,7 @@ public class ForwardDrive extends LinearOpMode {
             backRight.setPower(0.65);
 
             timer.reset();
-            while (opModeIsActive() && timer.seconds() < .85) {
+            while (opModeIsActive() && timer.seconds() < 1) {
                 idle();
             }
 
@@ -40,13 +40,13 @@ public class ForwardDrive extends LinearOpMode {
 
             // Rotate for 1 second
             if (opModeIsActive()) {
-                frontLeft.setPower(-0.65);
-                frontRight.setPower(0.65);
+                frontLeft.setPower(0.65);
+                frontRight.setPower(-0.65);
                 backLeft.setPower(-0.65);
                 backRight.setPower(0.65);
 
                 timer.reset();
-                while (opModeIsActive() && timer.seconds() < .85) {
+                while (opModeIsActive() && timer.seconds() < 1) {
                     idle();
                 }
             }
@@ -63,7 +63,7 @@ public class ForwardDrive extends LinearOpMode {
                 backRight.setPower(0.65);
 
                 timer.reset();
-                while (opModeIsActive() && timer.seconds() < .85) {
+                while (opModeIsActive() && timer.seconds() < 1) {
                     idle();
                 }
             }
