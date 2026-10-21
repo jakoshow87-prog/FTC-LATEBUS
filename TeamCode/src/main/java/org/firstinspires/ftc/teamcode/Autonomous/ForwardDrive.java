@@ -21,40 +21,65 @@ public class ForwardDrive extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            // Drive forward for 5 seconds
             ElapsedTime timer = new ElapsedTime();
-            timer.reset();
 
+            // Drive forward for 5 seconds
             frontLeft.setPower(0.65);
             frontRight.setPower(0.65);
             backLeft.setPower(0.65);
             backRight.setPower(0.65);
 
+            timer.reset();
             while (opModeIsActive() && timer.seconds() < 1.0) {
+                idle();
             }
 
             // Stop briefly before rotating
-            frontLeft.setPower(0);
-            frontRight.setPower(0);
-            backLeft.setPower(0);
-            backRight.setPower(0);
+            stopMotors(frontLeft, frontRight, backLeft, backRight);
             sleep(500);
 
-            // Rotate for 1 second (adjust duration and power to change the turn)
-            timer.reset();
-            frontLeft.setPower(-0.65);
-            frontRight.setPower(0.65);
-            backLeft.setPower(-0.65);
-            backRight.setPower(0.65);
+            // Rotate for 1 second
+            if (opModeIsActive()) {
+                frontLeft.setPower(-0.65);
+                frontRight.setPower(0.65);
+                backLeft.setPower(-0.65);
+                backRight.setPower(0.65);
 
-            while (opModeIsActive() && timer.seconds() < 1.0) {
+                timer.reset();
+                while (opModeIsActive() && timer.seconds() < 1.0) {
+                    idle();
+                }
             }
 
-            // Stop after rotating
-            frontLeft.setPower(0);
-            frontRight.setPower(0);
-            backLeft.setPower(0);
-            backRight.setPower(0);
-        }
+            // Stop briefly after rotating
+            stopMotors(frontLeft, frontRight, backLeft, backRight);
+            sleep(500);
 
+            // Drive forward again for 5 seconds
+            if (opModeIsActive()) {
+                frontLeft.setPower(0.65);
+                frontRight.setPower(0.65);
+                backLeft.setPower(0.65);
+                backRight.setPower(0.65);
+
+                timer.reset();
+                while (opModeIsActive() && timer.seconds() < 1.0) {
+                    idle();
+                }
+            }
+
+            stopMotors(frontLeft, frontRight, backLeft, backRight);
+        }
     }
+
+    private void stopMotors(
+            DcMotor frontLeft,
+            DcMotor frontRight,
+            DcMotor backLeft,
+            DcMotor backRight) {
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+}
