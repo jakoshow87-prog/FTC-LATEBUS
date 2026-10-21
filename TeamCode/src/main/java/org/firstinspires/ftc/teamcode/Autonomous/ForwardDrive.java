@@ -30,7 +30,7 @@ public class ForwardDrive extends LinearOpMode {
             backRight.setPower(0.65);
 
             timer.reset();
-            while (opModeIsActive() && timer.seconds() < 1.0) {
+            while (opModeIsActive() && timer.seconds() < .85) {
                 idle();
             }
 
@@ -46,7 +46,7 @@ public class ForwardDrive extends LinearOpMode {
                 backRight.setPower(0.65);
 
                 timer.reset();
-                while (opModeIsActive() && timer.seconds() < 1.0) {
+                while (opModeIsActive() && timer.seconds() < .85) {
                     idle();
                 }
             }
@@ -63,7 +63,7 @@ public class ForwardDrive extends LinearOpMode {
                 backRight.setPower(0.65);
 
                 timer.reset();
-                while (opModeIsActive() && timer.seconds() < 1.0) {
+                while (opModeIsActive() && timer.seconds() < .85) {
                     idle();
                 }
             }
