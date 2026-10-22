@@ -41,9 +41,9 @@ public class ForwardDriveNTurn extends LinearOpMode {
             // Rotate for 1 second
             if (opModeIsActive()) {
                 frontLeft.setPower(0.65);
-                frontRight.setPower(-0.65);
+                frontRight.setPower(0.65);
                 backLeft.setPower(-0.65);
-                backRight.setPower(0.65);
+                backRight.setPower(-0.65);
 
                 timer.reset();
                 while (opModeIsActive() && timer.seconds() < 1) {
