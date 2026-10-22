@@ -6,10 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@TeleOp(name = "Shoot" +
-        "" +
-        "er PIDF Test", group = "Test")
-public class ShooterTestOpMode extends LinearOpMode {
+@TeleOp(name = "Shooter PIDF Test", group = "Test")
+public class ShooterPIDFTuner extends LinearOpMode {
 
     private static final String SHOOTER_NAME = "shooter";
 
