@@ -30,10 +30,10 @@ public class ShooterPIDFTuner extends LinearOpMode {
      */
     private static final boolean USE_CUSTOM_PIDF = false;
 
-    private static final double PID_P = 0.0012;
+    private static final double PID_P = 0.0015;
     private static final double PID_I = 0.0;
     private static final double PID_D = 0.0;
-    private static final double PID_F = 0.001;
+    private static final double PID_F = 0.005;
 
     @Override
     public void runOpMode() {
