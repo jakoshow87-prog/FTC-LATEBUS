@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-
+// only can be used with expansion hub
 @TeleOp(name = "CompOpquestion", group = "TeleOp")
 public class CompOpquestion extends LinearOpMode {
     private static final String SHOOTER_NAME = "shooter";

@@ -48,7 +48,7 @@ public class ForwardNStrafe extends LinearOpMode {
                 backRight.setPower(0.65);
 
                 timer.reset();
-                while (opModeIsActive() && timer.seconds() < 2) {
+                while (opModeIsActive() && timer.seconds() < 0.85) {
                     idle();
                 }
             }
