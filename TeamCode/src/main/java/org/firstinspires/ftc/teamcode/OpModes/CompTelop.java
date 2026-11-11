@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 
 // Can only be used with expansion hub
+// Pollen RPM reaching around 4000
 @TeleOp(name = "CompTelop", group = "MAINOPMODES")
 public class CompTelop extends LinearOpMode {
     private static final String INTAKE_MOTOR_NAME = "Intake";
