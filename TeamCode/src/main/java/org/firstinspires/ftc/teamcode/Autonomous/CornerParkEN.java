@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 // currently in the works and learning
-@Autonomous(name = "EncoderAutoFNT", group = "Auto")
-public class EncoderFNT extends LinearOpMode {
+@Autonomous(name = "CornerParkEN", group = "Auto")
+public class CornerParkEN extends LinearOpMode {
 
     // Core Hex encoder and 2:1 speed ratio:
     // 288 motor counts per revolution; wheel turns twice per motor turn.

@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 
@@ -11,11 +13,14 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 @TeleOp(name = "Percentage Telop", group = "MAINOPMODES")
 public class PercantageTelop extends LinearOpMode {
     private static final String INTAKE_MOTOR_NAME = "Intake";
-    private static final String KICKER_SERVO_NAME = "Kicker";
+    private static final String KICKER_SERVO_NAME = "kicker";
+    private static final String GATE_SERVO_NAME = "Gate";
+    private static final double GATE_CENTER_POSITION = 0.65;
+    private static final double GATE_RIGHT_POSITION = 1.0;
     private static final String POLLEN_MOTOR_NAME = "Pollen";
-    private static final double POLLEN_POWER = -0.90;
+    private static final double POLLEN_POWER = -0.76;
     private static final double KICKER_POWER = -1.0;
-    private static final double SHOOTER_HIGH_POWER = 0.99;
+    private static final double SHOOTER_HIGH_POWER = -0.90;
     private static final double SHOOTER_LOW_POWER = -0.85;
 
     @Override
@@ -28,18 +33,23 @@ public class PercantageTelop extends LinearOpMode {
         DcMotor pollenMotor = hardwareMap.get(DcMotor.class, POLLEN_MOTOR_NAME);
         Intake intake = new Intake(hardwareMap, INTAKE_MOTOR_NAME);
         CRServo kickerServo = hardwareMap.get(CRServo.class, KICKER_SERVO_NAME);
+        Servo pollenGate = hardwareMap.get(Servo.class, GATE_SERVO_NAME);
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+
         shooterMotor.setDirection(DcMotor.Direction.REVERSE);
         shooterMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pollenMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pollenMotor.setPower(0.0);
         kickerServo.setPower(0.0);
+        pollenGate.setPosition(GATE_CENTER_POSITION);
 
         telemetry.addLine("Left stick: drive; right stick: strafe/turn.");
         telemetry.addLine("A: shooter at 90%; X: shooter at 85%; START: stop.");
         telemetry.addLine("B: toggle kicker; Y: toggle pollen shooter at 95%.");
+        telemetry.addLine("R1: toggle Gate between center and right limit.");
         telemetry.addLine("Triggers: intake forward/reverse.");
         telemetry.addData("Intake speed", intake.getSpeed());
         telemetry.update();
@@ -50,6 +60,8 @@ public class PercantageTelop extends LinearOpMode {
         boolean pollenRunning = false;
         boolean previousB = false;
         boolean previousY = false;
+        boolean gateAtRight = false;
+        boolean previousR1 = false;
         boolean previousStart = false;
 
         while (opModeIsActive()) {
@@ -89,11 +101,15 @@ public class PercantageTelop extends LinearOpMode {
             boolean b = gamepad1.b;
             boolean start = gamepad1.start;
             boolean yButton = gamepad1.y;
+            boolean r1 = gamepad1.right_bumper;
             if (b && !previousB) {
                 kickerRunning = !kickerRunning;
             }
             if (yButton && !previousY) {
                 pollenRunning = !pollenRunning;
+            }
+            if (r1 && !previousR1) {
+                gateAtRight = !gateAtRight;
             }
             if (start && !previousStart) {
                 shooterRunning = false;
@@ -104,9 +120,11 @@ public class PercantageTelop extends LinearOpMode {
             pollenMotor.setPower(pollenRunning ? POLLEN_POWER : 0.0);
             previousB = b;
             previousY = yButton;
+            previousR1 = r1;
             previousStart = start;
 
             kickerServo.setPower(kickerRunning ? KICKER_POWER : 0.0);
+            pollenGate.setPosition(gateAtRight ? GATE_RIGHT_POSITION : GATE_CENTER_POSITION);
 
             String intakeState = gamepad1.right_trigger > 0.1 ? "Forward"
                     : gamepad1.left_trigger > 0.1 ? "Reverse" : "Stopped";
@@ -114,7 +132,8 @@ public class PercantageTelop extends LinearOpMode {
             telemetry.addData("Shooter", shooterRunning ? "Running" : "Stopped");
             telemetry.addData("Intake", intakeState);
             telemetry.addData("Kicker", kickerRunning ? "Running" : "Stopped");
-            telemetry.addData("Pollen shooter", pollenRunning ? "Running at 95%" : "Stopped");
+            telemetry.addData("Gate", gateAtRight ? "Right" : "Center");
+            telemetry.addData("Pollen shooter", pollenRunning ? "Running at 85%" : "Stopped");
             telemetry.update();
             idle();
         }
@@ -123,12 +142,14 @@ public class PercantageTelop extends LinearOpMode {
         shooterMotor.setPower(0.0);
         pollenMotor.setPower(0.0);
         kickerServo.setPower(0.0);
+        pollenGate.setPosition(GATE_CENTER_POSITION);
         frontLeftMotor.setPower(0.0);
         frontRightMotor.setPower(0.0);
         backLeftMotor.setPower(0.0);
         backRightMotor.setPower(0.0);
     }
 }
+
 
 
 
