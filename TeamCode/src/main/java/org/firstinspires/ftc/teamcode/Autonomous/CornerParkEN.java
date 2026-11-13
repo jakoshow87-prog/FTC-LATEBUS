@@ -46,8 +46,8 @@ public class CornerParkEN extends LinearOpMode {
 
         // Hub flat, logo facing robot front, USB facing robot back.
         RevHubOrientationOnRobot hubOrientation = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
+                RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP);
         imu.initialize(new IMU.Parameters(hubOrientation));
 
         DcMotorEx[] motors = {frontLeft, frontRight, backLeft, backRight};

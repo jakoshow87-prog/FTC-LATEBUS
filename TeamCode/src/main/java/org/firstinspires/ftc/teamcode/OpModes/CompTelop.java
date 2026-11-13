@@ -22,9 +22,14 @@ public class CompTelop extends LinearOpMode {
     private static final String KICKER_SERVO_NAME = "kicker";
     private static final String POLLEN_GATE_SERVO_NAME = "Gate";
 
-    // GATE SETTINGS - UNCHANGED
-    private static final double POLLEN_GATE_CENTER = 0.65;
-    private static final double POLLEN_GATE_RIGHT = 1.0;
+    // GATE SETTINGS
+    private static final double POLLEN_GATE_CENTER = 0.77;
+    private static final double POLLEN_GATE_RIGHT = 0.85;
+    private static final long GATE_DWELL_START_MS = 1000L;
+    private static final long GATE_DWELL_INCREMENT_MS = 500L;
+    private static final long GATE_DWELL_ADJUST_MS = 250L;
+    private static final long GATE_DWELL_MIN_MS = 500L;
+    private static final long GATE_DWELL_MAX_MS = 10000L;
 
     // NECTAR SETTINGS
     private static final double WALL_SHOT = 2200.0;
@@ -32,7 +37,7 @@ public class CompTelop extends LinearOpMode {
             28.0 * (3.0 / 4.0);
 
     // POLLEN SETTINGS
-    private static final double POLLEN_TARGET_RPM = 1250.0;
+    private static final double POLLEN_TARGET_RPM = 2500.0;
     private static final double POLLEN_TICKS_PER_FLYWHEEL_REV = 28.0;
 
     // NECTAR PIDF
@@ -43,12 +48,12 @@ public class CompTelop extends LinearOpMode {
     private static final double NECTAR_PID_F = 42.56;
 
     // POLLEN PIDF
-    private static final double POLLEN_PID_P = 0.0015;
+    private static final double POLLEN_PID_P = 0.15;
     private static final double POLLEN_PID_I = 0.0;
-    private static final double POLLEN_PID_D = 0.0;
+    private static final double POLLEN_PID_D = 0.0006;
 
     // Automatically recalculates when target RPM changes.
-    private static final double POLLEN_PID_F = 35.107498;
+    private static final double POLLEN_PID_F = 15;
 
     private static final double KICKER_POWER = -1.0;
 
@@ -69,7 +74,7 @@ public class CompTelop extends LinearOpMode {
                 hardwareMap.get(DcMotor.class, "backRight");
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -129,11 +134,11 @@ public class CompTelop extends LinearOpMode {
 
         telemetry.addLine("COMP TELEOP READY");
         telemetry.addLine("A: Nectar shooter");
-        telemetry.addLine("Y: Toggle Pollen shooter");
-        telemetry.addLine("B: Toggle kicker");
-        telemetry.addLine("R1: Toggle Pollen gate");
-        telemetry.addLine("START: Stop shooters and kicker");
-        telemetry.addLine("Pollen diagnostic target: 1000 RPM");
+        telemetry.addLine("B: Toggle Pollen shooter");
+        telemetry.addLine("LB: Toggle kicker");
+        telemetry.addLine("RB: Start/stop pollen gate loop" );
+        telemetry.addLine("D-pad up/down: adjust starting gate hold time" );
+        telemetry.addLine("START: Stop shooters/kicker; return gate to center");
         telemetry.update();
 
         waitForStart();
@@ -142,15 +147,21 @@ public class CompTelop extends LinearOpMode {
         boolean pollenEnabled = false;
 
         boolean previousA = false;
-        boolean previousY = false;
+        boolean previousPollenButton = false;
 
         boolean kickerEnabled = false;
-        boolean previousB = false;
+        boolean previousLB = false;
 
         boolean previousStart = false;
 
+        boolean gateLoopEnabled = false;
         boolean pollenGateRight = false;
-        boolean previousR1 = false;
+        long gateBaseDwellMs = GATE_DWELL_START_MS;
+        long gateSwitchCount = 0;
+        long gateNextSwitchNanos = 0L;
+        boolean previousRB = false;
+        boolean previousDpadUp = false;
+        boolean previousDpadDown = false;
 
         while (opModeIsActive()) {
 
@@ -187,38 +198,57 @@ public class CompTelop extends LinearOpMode {
 
             // BUTTON INPUTS
             boolean a = gamepad1.a;
-            boolean yButton = gamepad1.y;
-            boolean b = gamepad1.b;
+            boolean pollenButton = gamepad1.b;
+            boolean lb = gamepad1.left_bumper;
             boolean start = gamepad1.start;
-            boolean r1 = gamepad1.right_bumper;
+            boolean rb = gamepad1.right_bumper;
+            boolean dpadUp = gamepad1.dpad_up;
+            boolean dpadDown = gamepad1.dpad_down;
 
             if (a && !previousA && !nectarEnabled) {
                 nectarEnabled = true;
             }
 
-            if (yButton && !previousY) {
+            if (pollenButton && !previousPollenButton) {
                 pollenEnabled = !pollenEnabled;
             }
 
-            if (b && !previousB) {
+            if (lb && !previousLB) {
                 kickerEnabled = !kickerEnabled;
             }
 
-            if (r1 && !previousR1) {
-                pollenGateRight = !pollenGateRight;
+            if (rb && !previousRB) {
+                gateLoopEnabled = !gateLoopEnabled;
+                if (gateLoopEnabled) {
+                    gateNextSwitchNanos = System.nanoTime() + gateBaseDwellMs * 1_000_000L;
+                }
+            }
+
+            if (dpadUp && !previousDpadUp) {
+                gateBaseDwellMs = Math.min(GATE_DWELL_MAX_MS, gateBaseDwellMs + GATE_DWELL_ADJUST_MS);
+            }
+            if (dpadDown && !previousDpadDown) {
+                gateBaseDwellMs = Math.max(GATE_DWELL_MIN_MS, gateBaseDwellMs - GATE_DWELL_ADJUST_MS);
             }
 
             if (start && !previousStart) {
                 nectarEnabled = false;
                 pollenEnabled = false;
                 kickerEnabled = false;
+                gateLoopEnabled = false;
+                pollenGateRight = false;
+                gateBaseDwellMs = GATE_DWELL_START_MS;
+                gateSwitchCount = 0;
+                pollenGate.setPosition(POLLEN_GATE_CENTER);
             }
 
             previousA = a;
-            previousY = yButton;
-            previousB = b;
+            previousPollenButton = pollenButton;
+            previousLB = lb;
             previousStart = start;
-            previousR1 = r1;
+            previousRB = rb;
+            previousDpadUp = dpadUp;
+            previousDpadDown = dpadDown;
 
             // TARGET VELOCITIES
             double nectarTicksPerSecond =
@@ -241,11 +271,13 @@ public class CompTelop extends LinearOpMode {
                     kickerEnabled ? KICKER_POWER : 0.0
             );
 
-            pollenGate.setPosition(
-                    pollenGateRight
-                            ? POLLEN_GATE_RIGHT
-                            : POLLEN_GATE_CENTER
-            );
+            if (gateLoopEnabled && System.nanoTime() >= gateNextSwitchNanos) {
+                pollenGateRight = !pollenGateRight;
+                pollenGate.setPosition(pollenGateRight ? POLLEN_GATE_RIGHT : POLLEN_GATE_CENTER);
+                gateSwitchCount++;
+                long dwellMs = gateBaseDwellMs + (gateSwitchCount / 2) * GATE_DWELL_INCREMENT_MS;
+                gateNextSwitchNanos = System.nanoTime() + dwellMs * 1_000_000L;
+            }
 
             // RAW ENCODER VELOCITIES
             double nectarRawVelocity = shooter.getVelocity();
@@ -318,8 +350,9 @@ public class CompTelop extends LinearOpMode {
 
             // OTHER TELEMETRY
             telemetry.addLine("========== OTHER ==========");
-            telemetry.addData("Pollen Gate",
-                    pollenGateRight ? "Right" : "Center");
+            telemetry.addData("Pollen Gate loop", gateLoopEnabled ? "Running" : "Stopped");
+            telemetry.addData("Gate position", "%.2f", pollenGateRight ? POLLEN_GATE_RIGHT : POLLEN_GATE_CENTER);
+            telemetry.addData("Gate dwell", "%.2f sec", (gateBaseDwellMs + (gateSwitchCount / 2) * GATE_DWELL_INCREMENT_MS) / 1000.0);
 
             telemetry.addData("Kicker",
                     kickerEnabled ? "Running" : "Stopped");
@@ -352,3 +385,10 @@ public class CompTelop extends LinearOpMode {
         backRightMotor.setPower(0.0);
     }
 }
+
+
+
+
+
+
+

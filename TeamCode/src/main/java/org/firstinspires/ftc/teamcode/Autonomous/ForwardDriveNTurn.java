@@ -3,11 +3,10 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name = "ForwardDriveNTurn", group = "Auto")
 public class ForwardDriveNTurn extends LinearOpMode {
-// not as precise and needs exact postitioning to be used
+
     @Override
     public void runOpMode() {
         DcMotor frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
@@ -21,51 +20,35 @@ public class ForwardDriveNTurn extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            ElapsedTime timer = new ElapsedTime();
-
-            // Drive forward for 5 seconds
+            // Drive forward for 1 second
             frontLeft.setPower(0.65);
             frontRight.setPower(0.65);
             backLeft.setPower(0.65);
             backRight.setPower(0.65);
+            sleep(1000);
 
-            timer.reset();
-            while (opModeIsActive() && timer.seconds() < 1) {
-                idle();
-            }
-
-            // Stop briefly before rotating
             stopMotors(frontLeft, frontRight, backLeft, backRight);
             sleep(500);
 
-            // Rotate for 1 second
             if (opModeIsActive()) {
+                // Rotate for 1 second
                 frontLeft.setPower(0.65);
                 frontRight.setPower(0.65);
                 backLeft.setPower(-0.65);
                 backRight.setPower(-0.65);
-
-                timer.reset();
-                while (opModeIsActive() && timer.seconds() < 1) {
-                    idle();
-                }
+                sleep(1000);
             }
 
-            // Stop briefly after rotating
             stopMotors(frontLeft, frontRight, backLeft, backRight);
             sleep(500);
 
-            // Drive forward again for 5 seconds
             if (opModeIsActive()) {
+                // Drive forward again for 1 second
                 frontLeft.setPower(0.65);
                 frontRight.setPower(0.65);
                 backLeft.setPower(0.65);
                 backRight.setPower(0.65);
-
-                timer.reset();
-                while (opModeIsActive() && timer.seconds() < 1) {
-                    idle();
-                }
+                sleep(1000);
             }
 
             stopMotors(frontLeft, frontRight, backLeft, backRight);
