@@ -15,7 +15,7 @@ public class ForwardDriveNTurn extends LinearOpMode {
         DcMotor backRight = hardwareMap.get(DcMotor.class, "backRight");
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
 
@@ -31,11 +31,11 @@ public class ForwardDriveNTurn extends LinearOpMode {
             sleep(500);
 
             if (opModeIsActive()) {
-                // Rotate for 1 second
-                frontLeft.setPower(0.65);
+                // Rotate to the left for 1 second
+                frontLeft.setPower(-0.65);
                 frontRight.setPower(0.65);
                 backLeft.setPower(-0.65);
-                backRight.setPower(-0.65);
+                backRight.setPower(0.65);
                 sleep(1000);
             }
 
@@ -44,10 +44,10 @@ public class ForwardDriveNTurn extends LinearOpMode {
 
             if (opModeIsActive()) {
                 // Drive forward again for 1 second
-                frontLeft.setPower(0.65);
+                frontLeft.setPower(-0.65);
                 frontRight.setPower(0.65);
-                backLeft.setPower(0.65);
-                backRight.setPower(0.65);
+                backLeft.setPower(-0.65);
+                backRight.setPower(-0.65);
                 sleep(1000);
             }
 
@@ -66,3 +66,4 @@ public class ForwardDriveNTurn extends LinearOpMode {
         backRight.setPower(0);
     }
 }
+
