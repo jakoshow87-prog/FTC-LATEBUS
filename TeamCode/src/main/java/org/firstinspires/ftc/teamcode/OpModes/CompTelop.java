@@ -25,8 +25,8 @@ public class CompTelop extends LinearOpMode {
     // GATE SETTINGS
     private static final double POLLEN_GATE_CENTER = 0.77;
     private static final double POLLEN_GATE_RIGHT = 0.85;
-    private static final long GATE_DWELL_START_MS = 1000L;
-    private static final long GATE_DWELL_INCREMENT_MS = 500L;
+    private static final long GATE_DWELL_START_MS = 500L;
+    private static final long GATE_DWELL_INCREMENT_MS = 250L;
     private static final long GATE_DWELL_ADJUST_MS = 250L;
     private static final long GATE_DWELL_MIN_MS = 500L;
     private static final long GATE_DWELL_MAX_MS = 10000L;
@@ -48,7 +48,7 @@ public class CompTelop extends LinearOpMode {
     private static final double NECTAR_PID_F = 42.56;
 
     // POLLEN PIDF
-    private static final double POLLEN_PID_P = 0.15;
+    private static final double POLLEN_PID_P = 0.18;
     private static final double POLLEN_PID_I = 0.0;
     private static final double POLLEN_PID_D = 0.0006;
 
