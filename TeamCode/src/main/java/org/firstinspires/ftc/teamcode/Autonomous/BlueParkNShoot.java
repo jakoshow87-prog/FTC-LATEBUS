@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "ParkNShoot", group = "Auto")
-public class ParkNShoot extends LinearOpMode {
+@Autonomous(name = "BlueParkNShoot", group = "Auto")
+public class BlueParkNShoot extends LinearOpMode {
 
     private static final String POLLEN_SHOOTER_NAME = "Pollen";
     private static final String POLLEN_GATE_SERVO_NAME = "Gate";

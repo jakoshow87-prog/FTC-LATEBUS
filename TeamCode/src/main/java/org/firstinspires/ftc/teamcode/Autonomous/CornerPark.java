@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name = "ParkAuto", group = "Auto")
-public class ParkAuto extends LinearOpMode {
+@Autonomous(name = "CornerPark", group = "Auto")
+public class CornerPark extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -29,29 +29,6 @@ public class ParkAuto extends LinearOpMode {
 
             stopMotors(frontLeft, frontRight, backLeft, backRight);
             sleep(500);
-
-            if (opModeIsActive()) {
-                // Rotate to the left for 1 second
-                frontLeft.setPower(-0.65);
-                frontRight.setPower(0.65);
-                backLeft.setPower(-0.65);
-                backRight.setPower(0.65);
-                sleep(1000);
-            }
-
-            stopMotors(frontLeft, frontRight, backLeft, backRight);
-            sleep(500);
-
-            if (opModeIsActive()) {
-                // Drive forward again for 1 second
-                frontLeft.setPower(-0.65);
-                frontRight.setPower(-0.65);
-                backLeft.setPower(-0.65);
-                backRight.setPower(-0.65);
-                sleep(1000);
-            }
-
-            stopMotors(frontLeft, frontRight, backLeft, backRight);
         }
     }
 
