@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -24,19 +23,23 @@ public class CompTelop extends LinearOpMode {
     private static final double POLLEN_GATE_CENTER = 0.77;
     private static final double POLLEN_GATE_RIGHT = 0.85;
 
+    // Kicker positions: adjust for your mechanism
+    private static final double KICKER_REST_POSITION = 0.70;
+    private static final double KICKER_ACTIVE_POSITION = 1;
+
     // Nectar settings
     private static final double WALL_SHOT = 2200.0;
     private static final double TICKS_PER_FLYWHEEL_REV =
             28.0 * (3.0 / 4.0);
 
     // Pollen settings
-    private static final double POLLEN_TARGET_RPM = 2500.0;
+    private static final double POLLEN_TARGET_RPM = 2600.0;
     private static final double POLLEN_TICKS_PER_FLYWHEEL_REV = 28.0;
 
     // Nectar PIDF
-    private static final double NECTAR_PID_P = 0.0018;
+    private static final double NECTAR_PID_P = 0.0022;
     private static final double NECTAR_PID_I = 0.0;
-    private static final double NECTAR_PID_D = 0.0;
+    private static final double NECTAR_PID_D = 0.0002;
     private static final double NECTAR_PID_F = 42.56;
 
     // Pollen PIDF
@@ -44,8 +47,6 @@ public class CompTelop extends LinearOpMode {
     private static final double POLLEN_PID_I = 0.0;
     private static final double POLLEN_PID_D = 0.0006;
     private static final double POLLEN_PID_F = 15.0;
-
-    private static final double KICKER_POWER = -1.0;
 
     @Override
     public void runOpMode() {
@@ -73,8 +74,8 @@ public class CompTelop extends LinearOpMode {
         DcMotorEx pollenShooter =
                 hardwareMap.get(DcMotorEx.class, POLLEN_SHOOTER_NAME);
 
-        CRServo kickerServo =
-                hardwareMap.get(CRServo.class, KICKER_SERVO_NAME);
+        Servo kickerServo =
+                hardwareMap.get(Servo.class, KICKER_SERVO_NAME);
         Servo pollenGate =
                 hardwareMap.get(Servo.class, POLLEN_GATE_SERVO_NAME);
 
@@ -105,16 +106,16 @@ public class CompTelop extends LinearOpMode {
         );
         pollenShooter.setVelocity(0.0);
 
-        // Servo initialization
-        kickerServo.setPower(0.0);
+        // Positional servo initialization
+        kickerServo.setPosition(KICKER_REST_POSITION);
         pollenGate.setPosition(POLLEN_GATE_CENTER);
 
         telemetry.addLine("COMP TELEOP READY");
         telemetry.addLine("A: Nectar shooter");
         telemetry.addLine("B: Toggle Pollen shooter");
-        telemetry.addLine("LB: Toggle kicker");
+        telemetry.addLine("LB: Toggle kicker between rest and active");
         telemetry.addLine("RB: Toggle pollen gate between center and right");
-        telemetry.addLine("START: Stop shooters/kicker; return gate to center");
+        telemetry.addLine("START: Stop shooters/kicker; return servos to rest");
         telemetry.update();
 
         waitForStart();
@@ -177,6 +178,7 @@ public class CompTelop extends LinearOpMode {
                 pollenEnabled = !pollenEnabled;
             }
 
+            // Each LB press toggles the kicker between its two positions.
             if (lb && !previousLB) {
                 kickerEnabled = !kickerEnabled;
             }
@@ -213,8 +215,12 @@ public class CompTelop extends LinearOpMode {
                     pollenEnabled ? pollenTicksPerSecond : 0.0
             );
 
-            // Servos
-            kickerServo.setPower(kickerEnabled ? KICKER_POWER : 0.0);
+            // Positional servos
+            kickerServo.setPosition(
+                    kickerEnabled
+                            ? KICKER_ACTIVE_POSITION
+                            : KICKER_REST_POSITION
+            );
             pollenGate.setPosition(
                     pollenGateRight
                             ? POLLEN_GATE_RIGHT
@@ -271,7 +277,11 @@ public class CompTelop extends LinearOpMode {
                             ? POLLEN_GATE_RIGHT
                             : POLLEN_GATE_CENTER);
             telemetry.addData("Kicker",
-                    kickerEnabled ? "Running" : "Stopped");
+                    kickerEnabled ? "Active" : "Rest");
+            telemetry.addData("Kicker position", "%.2f",
+                    kickerEnabled
+                            ? KICKER_ACTIVE_POSITION
+                            : KICKER_REST_POSITION);
             telemetry.addData("Intake",
                     gamepad1.right_trigger > 0.1 ? "Forward"
                             : gamepad1.left_trigger > 0.1
@@ -283,11 +293,11 @@ public class CompTelop extends LinearOpMode {
             idle();
         }
 
-        // Stop everything
+        // Stop everything and return positional servos to their resting positions.
         intake.stop();
         shooter.setVelocity(0.0);
         pollenShooter.setVelocity(0.0);
-        kickerServo.setPower(0.0);
+        kickerServo.setPosition(KICKER_REST_POSITION);
         pollenGate.setPosition(POLLEN_GATE_CENTER);
         frontLeftMotor.setPower(0.0);
         frontRightMotor.setPower(0.0);
@@ -295,3 +305,4 @@ public class CompTelop extends LinearOpMode {
         backRightMotor.setPower(0.0);
     }
 }
+
