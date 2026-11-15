@@ -25,7 +25,7 @@ public class CornerPark extends LinearOpMode {
             frontRight.setPower(0.65);
             backLeft.setPower(0.65);
             backRight.setPower(0.65);
-            sleep(1000);
+            sleep(1250);
 
             stopMotors(frontLeft, frontRight, backLeft, backRight);
             sleep(500);

@@ -36,7 +36,7 @@ public class BlueParkAuto extends LinearOpMode {
                 frontRight.setPower(0.65);
                 backLeft.setPower(-0.65);
                 backRight.setPower(0.65);
-                sleep(1200);
+                sleep(1000);
             }
 
             stopMotors(frontLeft, frontRight, backLeft, backRight);
@@ -44,10 +44,10 @@ public class BlueParkAuto extends LinearOpMode {
 
             if (opModeIsActive()) {
                 // Drive forward again for 1 second
-                frontLeft.setPower(-0.65);
-                frontRight.setPower(-0.65);
-                backLeft.setPower(-0.65);
-                backRight.setPower(-0.65);
+                frontLeft.setPower(0.65);
+                frontRight.setPower(0.65);
+                backLeft.setPower(0.65);
+                backRight.setPower(0.65);
                 sleep(2000);
             }
 

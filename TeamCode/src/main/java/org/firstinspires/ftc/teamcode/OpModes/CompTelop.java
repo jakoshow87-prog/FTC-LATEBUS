@@ -19,13 +19,14 @@ public class CompTelop extends LinearOpMode {
     private static final String KICKER_SERVO_NAME = "kicker";
     private static final String POLLEN_GATE_SERVO_NAME = "Gate";
 
-    // Gate positions
+    // Gate positions and hold time
     private static final double POLLEN_GATE_CENTER = 0.77;
     private static final double POLLEN_GATE_RIGHT = 0.85;
+    private static final long GATE_RIGHT_HOLD_MS = 1000L;
 
-    // Kicker positions: adjust for your mechanism
+    // Kicker positions
     private static final double KICKER_REST_POSITION = 0.70;
-    private static final double KICKER_ACTIVE_POSITION = 1;
+    private static final double KICKER_ACTIVE_POSITION = 1.0;
 
     // Nectar settings
     private static final double WALL_SHOT = 2200.0;
@@ -114,7 +115,7 @@ public class CompTelop extends LinearOpMode {
         telemetry.addLine("A: Nectar shooter");
         telemetry.addLine("B: Toggle Pollen shooter");
         telemetry.addLine("LB: Toggle kicker between rest and active");
-        telemetry.addLine("RB: Toggle pollen gate between center and right");
+        telemetry.addLine("RB: Gate moves right, then returns to center");
         telemetry.addLine("START: Stop shooters/kicker; return servos to rest");
         telemetry.update();
 
@@ -130,6 +131,8 @@ public class CompTelop extends LinearOpMode {
         boolean previousLB = false;
         boolean previousRB = false;
         boolean previousStart = false;
+
+        long gateReturnTimeNanos = 0L;
 
         while (opModeIsActive()) {
             // Drivetrain
@@ -178,14 +181,18 @@ public class CompTelop extends LinearOpMode {
                 pollenEnabled = !pollenEnabled;
             }
 
-            // Each LB press toggles the kicker between its two positions.
+            // LB toggles the kicker between rest and active.
             if (lb && !previousLB) {
                 kickerEnabled = !kickerEnabled;
             }
 
-            // Each RB press changes the gate to the opposite position.
+            // RB triggers the gate pulse.
             if (rb && !previousRB) {
-                pollenGateRight = !pollenGateRight;
+                pollenGateRight = true;
+                pollenGate.setPosition(POLLEN_GATE_RIGHT);
+                gateReturnTimeNanos =
+                        System.nanoTime()
+                                + GATE_RIGHT_HOLD_MS * 1_000_000L;
             }
 
             if (start && !previousStart) {
@@ -193,6 +200,15 @@ public class CompTelop extends LinearOpMode {
                 pollenEnabled = false;
                 kickerEnabled = false;
                 pollenGateRight = false;
+                gateReturnTimeNanos = 0L;
+                pollenGate.setPosition(POLLEN_GATE_CENTER);
+            }
+
+            // Return the gate to center when its hold time expires.
+            if (pollenGateRight
+                    && System.nanoTime() >= gateReturnTimeNanos) {
+                pollenGateRight = false;
+                pollenGate.setPosition(POLLEN_GATE_CENTER);
             }
 
             previousA = a;
@@ -215,16 +231,11 @@ public class CompTelop extends LinearOpMode {
                     pollenEnabled ? pollenTicksPerSecond : 0.0
             );
 
-            // Positional servos
+            // Positional kicker servo
             kickerServo.setPosition(
                     kickerEnabled
                             ? KICKER_ACTIVE_POSITION
                             : KICKER_REST_POSITION
-            );
-            pollenGate.setPosition(
-                    pollenGateRight
-                            ? POLLEN_GATE_RIGHT
-                            : POLLEN_GATE_CENTER
             );
 
             // Shooter telemetry
@@ -293,7 +304,7 @@ public class CompTelop extends LinearOpMode {
             idle();
         }
 
-        // Stop everything and return positional servos to their resting positions.
+        // Stop everything and return positional servos to rest.
         intake.stop();
         shooter.setVelocity(0.0);
         pollenShooter.setVelocity(0.0);
@@ -305,4 +316,3 @@ public class CompTelop extends LinearOpMode {
         backRightMotor.setPower(0.0);
     }
 }
-

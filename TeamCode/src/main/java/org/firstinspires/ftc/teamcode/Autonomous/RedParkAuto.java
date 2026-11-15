@@ -31,7 +31,7 @@ public class RedParkAuto extends LinearOpMode {
             sleep(500);
 
             if (opModeIsActive()) {
-                // Rotate to the left for 1 second
+                // Rotate
                 frontLeft.setPower(0.65);
                 frontRight.setPower(-0.65);
                 backLeft.setPower(0.65);
@@ -44,10 +44,10 @@ public class RedParkAuto extends LinearOpMode {
 
             if (opModeIsActive()) {
                 // Drive forward again for 1 second
-                frontLeft.setPower(-0.65);
-                frontRight.setPower(-0.65);
-                backLeft.setPower(-0.65);
-                backRight.setPower(-0.65);
+                frontLeft.setPower(0.65);
+                frontRight.setPower(0.65);
+                backLeft.setPower(0.65);
+                backRight.setPower(0.65);
                 sleep(2000);
             }
 
