@@ -37,11 +37,11 @@ public class CompTelop extends LinearOpMode {
     private static final double POLLEN_TARGET_RPM = 2600.0;
     private static final double POLLEN_TICKS_PER_FLYWHEEL_REV = 28.0;
 
-    // Nectar PIDF
+    // Nectar PIDF / need to tune may use dashboard
     private static final double NECTAR_PID_P = 0.0022;
     private static final double NECTAR_PID_I = 0.0;
     private static final double NECTAR_PID_D = 0.0002;
-    private static final double NECTAR_PID_F = 42.56;
+    private static final double NECTAR_PID_F = 42.56; // most likely need to change
 
     // Pollen PIDF
     private static final double POLLEN_PID_P = 0.16;

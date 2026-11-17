@@ -36,7 +36,6 @@ public class PercantageTelop extends LinearOpMode {
         Servo pollenGate = hardwareMap.get(Servo.class, GATE_SERVO_NAME);
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         shooterMotor.setDirection(DcMotor.Direction.REVERSE);

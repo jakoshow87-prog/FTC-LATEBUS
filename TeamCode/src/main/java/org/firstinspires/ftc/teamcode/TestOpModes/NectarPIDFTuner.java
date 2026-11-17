@@ -31,10 +31,10 @@ public class NectarPIDFTuner extends LinearOpMode {
     private static final boolean USE_CUSTOM_PIDF = true;
     // test P and F values first before applying D, but main focus on P.
 
-    private static final double PID_P = 0.0015; //.009
+    private static final double PID_P = 0.0022; // ale values .009
     private static final double PID_I = 0.0;
-    private static final double PID_D = 0.0; //.00001
-    private static final double PID_F = .007; //.0002
+    private static final double PID_D = 0.0002; // ale values .00001
+    private static final double PID_F = 42.56; // ale values .0002
 
     @Override
     public void runOpMode() {
