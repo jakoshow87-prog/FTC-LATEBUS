@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "BlueParkNShoot", group = "Auto")
-public class BlueParkNShoot extends LinearOpMode {
+@Autonomous(name = "SecondShootNPark", group = "Auto")
+public class SecondShootNPark extends LinearOpMode {
 
     private static final String POLLEN_SHOOTER_NAME = "Pollen";
     private static final String POLLEN_GATE_SERVO_NAME = "Gate";
@@ -18,10 +18,10 @@ public class BlueParkNShoot extends LinearOpMode {
     private static final double POLLEN_TARGET_RPM = 2500.0;
     private static final double POLLEN_TICKS_PER_REV = 28.0;
 
-    private static final double POLLEN_PID_P = 0.15;
-    private static final double POLLEN_PID_I = 0.0;
-    private static final double POLLEN_PID_D = 0.0006;
-    private static final double POLLEN_PID_F = 15.0;
+    public static double POLLEN_PID_P = 0.0016;
+    public static double POLLEN_PID_I = 0.0;
+    public static double POLLEN_PID_D = 0.2;
+    public static double POLLEN_PID_F = 14.5;
 
     @Override
     public void runOpMode() {
@@ -95,29 +95,58 @@ public class BlueParkNShoot extends LinearOpMode {
                 frontRight.setPower(0.65);
                 backLeft.setPower(0.65);
                 backRight.setPower(0.65);
-                sleep(1000);
+                sleep(500);
 
                 stopMotors(frontLeft, frontRight, backLeft, backRight);
                 sleep(500);
 
                 if (opModeIsActive()) {
-                    // Rotate
+                    // Left Rotation
                     frontLeft.setPower(-0.65);
                     frontRight.setPower(0.65);
                     backLeft.setPower(-0.65);
                     backRight.setPower(0.65);
-                    sleep(1200);
+                    sleep(1150);
                 }
 
                 stopMotors(frontLeft, frontRight, backLeft, backRight);
                 sleep(500);
 
                 if (opModeIsActive()) {
+                    // Right Rotation
                     frontLeft.setPower(0.65);
-                    frontRight.setPower(0.65);
+                    frontRight.setPower(-0.65);
                     backLeft.setPower(0.65);
-                    backRight.setPower(0.65);
-                    sleep(2000);
+                    backRight.setPower(-0.65);
+                    sleep(1150);
+
+                    // Foward drive until aligned with Park
+                    if (opModeIsActive()) {
+                        frontLeft.setPower(0.65);
+                        frontRight.setPower(0.65);
+                        backLeft.setPower(0.65);
+                        backRight.setPower(0.65);
+                        sleep(4000);
+
+                        if (opModeIsActive()) {
+                            // Left Rotation
+                            frontLeft.setPower(-0.65);
+                            frontRight.setPower(0.65);
+                            backLeft.setPower(-0.65);
+                            backRight.setPower(0.65);
+                            sleep(1150);
+
+                            if (opModeIsActive()) {
+                                // Right Rotation
+                                frontLeft.setPower(0.65);
+                                frontRight.setPower(0.65);
+                                backLeft.setPower(0.65);
+                                backRight.setPower(0.65);
+                                sleep(1150);
+                            }
+                        }
+
+                    }
                 }
             }
         }

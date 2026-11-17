@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,6 +13,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 
+@Config
 @TeleOp(name = "CompTelop", group = "MAINOPMODES")
 public class CompTelop extends LinearOpMode {
 
@@ -19,35 +23,31 @@ public class CompTelop extends LinearOpMode {
     private static final String KICKER_SERVO_NAME = "kicker";
     private static final String POLLEN_GATE_SERVO_NAME = "Gate";
 
-    // Gate positions and hold time
+    // Gate positions
     private static final double POLLEN_GATE_CENTER = 0.77;
     private static final double POLLEN_GATE_RIGHT = 0.85;
-    private static final long GATE_RIGHT_HOLD_MS = 1000L;
 
     // Kicker positions
     private static final double KICKER_REST_POSITION = 0.70;
     private static final double KICKER_ACTIVE_POSITION = 1.0;
 
-    // Nectar settings
+    // Shooter targets
     private static final double WALL_SHOT = 2200.0;
     private static final double TICKS_PER_FLYWHEEL_REV =
             28.0 * (3.0 / 4.0);
-
-    // Pollen settings
     private static final double POLLEN_TARGET_RPM = 2600.0;
     private static final double POLLEN_TICKS_PER_FLYWHEEL_REV = 28.0;
 
-    // Nectar PIDF / need to tune may use dashboard
-    private static final double NECTAR_PID_P = 0.0022;
-    private static final double NECTAR_PID_I = 0.0;
-    private static final double NECTAR_PID_D = 0.0002;
-    private static final double NECTAR_PID_F = 42.56; // most likely need to change
+    // Editable live in FTC Dashboard
+    public static double NECTAR_PID_P = 0.0022;
+    public static double NECTAR_PID_I = 0.0;
+    public static double NECTAR_PID_D = 0.0002;
+    public static double NECTAR_PID_F = 42.56;
 
-    // Pollen PIDF
-    private static final double POLLEN_PID_P = 0.16;
-    private static final double POLLEN_PID_I = 0.0;
-    private static final double POLLEN_PID_D = 0.0006;
-    private static final double POLLEN_PID_F = 15.0;
+    public static double POLLEN_PID_P = 0.0016;
+    public static double POLLEN_PID_I = 0.0;
+    public static double POLLEN_PID_D = 0.2;
+    public static double POLLEN_PID_F = 14.5;
 
     @Override
     public void runOpMode() {
@@ -87,35 +87,28 @@ public class CompTelop extends LinearOpMode {
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setVelocityPIDFCoefficients(
-                NECTAR_PID_P,
-                NECTAR_PID_I,
-                NECTAR_PID_D,
-                NECTAR_PID_F
-        );
         shooter.setVelocity(0.0);
 
         // Pollen initialization
         pollenShooter.setDirection(DcMotor.Direction.REVERSE);
         pollenShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         pollenShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pollenShooter.setVelocityPIDFCoefficients(
-                POLLEN_PID_P,
-                POLLEN_PID_I,
-                POLLEN_PID_D,
-                POLLEN_PID_F
-        );
         pollenShooter.setVelocity(0.0);
 
-        // Positional servo initialization
         kickerServo.setPosition(KICKER_REST_POSITION);
         pollenGate.setPosition(POLLEN_GATE_CENTER);
+
+        // Send telemetry to both the Driver Station and FTC Dashboard.
+        telemetry = new MultipleTelemetry(
+                telemetry,
+                FtcDashboard.getInstance().getTelemetry()
+        );
 
         telemetry.addLine("COMP TELEOP READY");
         telemetry.addLine("A: Nectar shooter");
         telemetry.addLine("B: Toggle Pollen shooter");
         telemetry.addLine("LB: Toggle kicker between rest and active");
-        telemetry.addLine("RB: Gate moves right, then returns to center");
+        telemetry.addLine("RB: Toggle gate between center and right");
         telemetry.addLine("START: Stop shooters/kicker; return servos to rest");
         telemetry.update();
 
@@ -132,9 +125,53 @@ public class CompTelop extends LinearOpMode {
         boolean previousRB = false;
         boolean previousStart = false;
 
-        long gateReturnTimeNanos = 0L;
+        // Last PIDF values sent to the motor controllers.
+        double appliedNectarP = Double.NaN;
+        double appliedNectarI = Double.NaN;
+        double appliedNectarD = Double.NaN;
+        double appliedNectarF = Double.NaN;
+
+        double appliedPollenP = Double.NaN;
+        double appliedPollenI = Double.NaN;
+        double appliedPollenD = Double.NaN;
+        double appliedPollenF = Double.NaN;
 
         while (opModeIsActive()) {
+            // Apply Dashboard PIDF edits when a value changes.
+            if (Double.compare(NECTAR_PID_P, appliedNectarP) != 0
+                    || Double.compare(NECTAR_PID_I, appliedNectarI) != 0
+                    || Double.compare(NECTAR_PID_D, appliedNectarD) != 0
+                    || Double.compare(NECTAR_PID_F, appliedNectarF) != 0) {
+                shooter.setVelocityPIDFCoefficients(
+                        NECTAR_PID_P,
+                        NECTAR_PID_I,
+                        NECTAR_PID_D,
+                        NECTAR_PID_F
+                );
+
+                appliedNectarP = NECTAR_PID_P;
+                appliedNectarI = NECTAR_PID_I;
+                appliedNectarD = NECTAR_PID_D;
+                appliedNectarF = NECTAR_PID_F;
+            }
+
+            if (Double.compare(POLLEN_PID_P, appliedPollenP) != 0
+                    || Double.compare(POLLEN_PID_I, appliedPollenI) != 0
+                    || Double.compare(POLLEN_PID_D, appliedPollenD) != 0
+                    || Double.compare(POLLEN_PID_F, appliedPollenF) != 0) {
+                pollenShooter.setVelocityPIDFCoefficients(
+                        POLLEN_PID_P,
+                        POLLEN_PID_I,
+                        POLLEN_PID_D,
+                        POLLEN_PID_F
+                );
+
+                appliedPollenP = POLLEN_PID_P;
+                appliedPollenI = POLLEN_PID_I;
+                appliedPollenD = POLLEN_PID_D;
+                appliedPollenF = POLLEN_PID_F;
+            }
+
             // Drivetrain
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
@@ -181,32 +218,23 @@ public class CompTelop extends LinearOpMode {
                 pollenEnabled = !pollenEnabled;
             }
 
-            // LB toggles the kicker between rest and active.
             if (lb && !previousLB) {
                 kickerEnabled = !kickerEnabled;
             }
 
-            // RB triggers the gate pulse.
             if (rb && !previousRB) {
-                pollenGateRight = true;
-                pollenGate.setPosition(POLLEN_GATE_RIGHT);
-                gateReturnTimeNanos =
-                        System.nanoTime()
-                                + GATE_RIGHT_HOLD_MS * 1_000_000L;
+                pollenGateRight = !pollenGateRight;
+                pollenGate.setPosition(
+                        pollenGateRight
+                                ? POLLEN_GATE_RIGHT
+                                : POLLEN_GATE_CENTER
+                );
             }
 
             if (start && !previousStart) {
                 nectarEnabled = false;
                 pollenEnabled = false;
                 kickerEnabled = false;
-                pollenGateRight = false;
-                gateReturnTimeNanos = 0L;
-                pollenGate.setPosition(POLLEN_GATE_CENTER);
-            }
-
-            // Return the gate to center when its hold time expires.
-            if (pollenGateRight
-                    && System.nanoTime() >= gateReturnTimeNanos) {
                 pollenGateRight = false;
                 pollenGate.setPosition(POLLEN_GATE_CENTER);
             }
@@ -263,8 +291,7 @@ public class CompTelop extends LinearOpMode {
                     nectarEnabled ? WALL_SHOT : 0.0);
             telemetry.addData("Measured RPM", "%.0f", nectarMeasuredRpm);
             telemetry.addData("Motor Power", "%.3f", shooter.getPower());
-            telemetry.addData("Nectar PIDF",
-                    "%.6f / %.6f / %.6f / %.6f",
+            telemetry.addData("Nectar PIDF", "P %.6f | I %.6f | D %.6f | F %.6f",
                     nectarPIDF.p, nectarPIDF.i,
                     nectarPIDF.d, nectarPIDF.f);
 
@@ -275,8 +302,7 @@ public class CompTelop extends LinearOpMode {
             telemetry.addData("Measured RPM", "%.0f", pollenMeasuredRpm);
             telemetry.addData("Motor Power", "%.3f",
                     pollenShooter.getPower());
-            telemetry.addData("Pollen PIDF",
-                    "%.6f / %.6f / %.6f / %.6f",
+            telemetry.addData("Pollen PIDF", "P %.6f | I %.6f | D %.6f | F %.6f",
                     pollenPIDF.p, pollenPIDF.i,
                     pollenPIDF.d, pollenPIDF.f);
 

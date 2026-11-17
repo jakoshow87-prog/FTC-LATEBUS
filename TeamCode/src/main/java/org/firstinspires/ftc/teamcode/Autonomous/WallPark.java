@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name = "BlueParkAuto", group = "Auto")
-public class BlueParkAuto extends LinearOpMode {
+@Autonomous(name = "WallPark", group = "Auto")
+public class WallPark extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -25,7 +25,7 @@ public class BlueParkAuto extends LinearOpMode {
             frontRight.setPower(0.65);
             backLeft.setPower(0.65);
             backRight.setPower(0.65);
-            sleep(1000);
+            sleep(750);
 
             stopMotors(frontLeft, frontRight, backLeft, backRight);
             sleep(500);
@@ -36,7 +36,7 @@ public class BlueParkAuto extends LinearOpMode {
                 frontRight.setPower(0.65);
                 backLeft.setPower(-0.65);
                 backRight.setPower(0.65);
-                sleep(1000);
+                sleep(1150);
             }
 
             stopMotors(frontLeft, frontRight, backLeft, backRight);
@@ -44,11 +44,11 @@ public class BlueParkAuto extends LinearOpMode {
 
             if (opModeIsActive()) {
                 // Drive forward again for 1 second
-                frontLeft.setPower(0.65);
-                frontRight.setPower(0.65);
-                backLeft.setPower(0.65);
-                backRight.setPower(0.65);
-                sleep(2000);
+                frontLeft.setPower(-0.65);
+                frontRight.setPower(-0.65);
+                backLeft.setPower(-0.65);
+                backRight.setPower(-0.65);
+                sleep(2150);
             }
 
             stopMotors(frontLeft, frontRight, backLeft, backRight);

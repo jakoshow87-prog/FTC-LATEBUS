@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 /**
  *  first connect to control hub's wifi
- *  then go to 192.168.43.1:8080/dash or 192.168.49.1:8080/dash in web browser
+ *  then go to 192.168.43.1:8080/dash  in web browser
  *  now you should be able to use dashboard
  */
 @Config
