@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 @Config
 @TeleOp(name = "CompTelop", group = "MAINOPMODES")
 public class CompTelop extends LinearOpMode {
-
+    // below are all constants will put in one single file
     private static final String INTAKE_MOTOR_NAME = "Intake";
     private static final String SHOOTER_NAME = "Nectar";
     private static final String POLLEN_SHOOTER_NAME = "Pollen";
@@ -47,10 +47,11 @@ public class CompTelop extends LinearOpMode {
     public static double POLLEN_PID_P = 0.0016;
     public static double POLLEN_PID_I = 0.0;
     public static double POLLEN_PID_D = 0.2;
-    public static double POLLEN_PID_F = 14.5;
+    public static double POLLEN_PID_F = 14;
 
     @Override
     public void runOpMode() {
+        // initalization
         DcMotor frontLeftMotor =
                 hardwareMap.get(DcMotor.class, "frontLeft");
         DcMotor frontRightMotor =
@@ -83,13 +84,13 @@ public class CompTelop extends LinearOpMode {
         VoltageSensor battery =
                 hardwareMap.voltageSensor.iterator().next();
 
-        // Nectar initialization
+        // Nectar shooter initialization
         shooter.setDirection(DcMotor.Direction.FORWARD);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter.setVelocity(0.0);
 
-        // Pollen initialization
+        // Pollen shooter initialization
         pollenShooter.setDirection(DcMotor.Direction.REVERSE);
         pollenShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         pollenShooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -104,7 +105,6 @@ public class CompTelop extends LinearOpMode {
                 FtcDashboard.getInstance().getTelemetry()
         );
 
-        telemetry.addLine("COMP TELEOP READY");
         telemetry.addLine("A: Nectar shooter");
         telemetry.addLine("B: Toggle Pollen shooter");
         telemetry.addLine("LB: Toggle kicker between rest and active");
@@ -172,7 +172,7 @@ public class CompTelop extends LinearOpMode {
                 appliedPollenF = POLLEN_PID_F;
             }
 
-            // Drivetrain
+            // drivetrain inputs
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
@@ -194,7 +194,7 @@ public class CompTelop extends LinearOpMode {
             backLeftMotor.setPower(backLeftPower / max);
             backRightMotor.setPower(backRightPower / max);
 
-            // Intake
+            // intake inputs
             if (gamepad1.right_trigger > 0.1) {
                 intake.run();
             } else if (gamepad1.left_trigger > 0.1) {
@@ -203,7 +203,7 @@ public class CompTelop extends LinearOpMode {
                 intake.stop();
             }
 
-            // Button inputs
+            // button inputs nectar, pollen, and gates
             boolean a = gamepad1.a;
             boolean pollenButton = gamepad1.b;
             boolean lb = gamepad1.left_bumper;
@@ -259,14 +259,14 @@ public class CompTelop extends LinearOpMode {
                     pollenEnabled ? pollenTicksPerSecond : 0.0
             );
 
-            // Positional kicker servo
+            // Positional nectar servo
             kickerServo.setPosition(
                     kickerEnabled
                             ? KICKER_ACTIVE_POSITION
                             : KICKER_REST_POSITION
             );
 
-            // Shooter telemetry
+            // shooter telemetry
             double nectarRawVelocity = shooter.getVelocity();
             double pollenRawVelocity = pollenShooter.getVelocity();
 
@@ -330,7 +330,7 @@ public class CompTelop extends LinearOpMode {
             idle();
         }
 
-        // Stop everything and return positional servos to rest.
+        // stop everything and return positional servos to rest.
         intake.stop();
         shooter.setVelocity(0.0);
         pollenShooter.setVelocity(0.0);
